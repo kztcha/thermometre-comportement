@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Le thermomètre du comportement</title>
+<style>
+  /* =========================================================
+     VARIABLES — modifie ces valeurs pour personnaliser le style
+     ========================================================= */
+  :root {
+    --sky-top: #4FC3F7;
+    --sky-mid: #8FE3FF;
+    --sky-low: #FFF3D2;
+    --sun: #FFD24C;
+    --sun-glow: rgba(255, 196, 61, 0.55);
+    --cloud: #FFFFFF;
+    --grass-1: #A8DD6B;
+    --grass-2: #7FC24A;
+    --grass-3: #5FA934;
+
+    --card-bg: #FFFDF7;
+    --paper-line: rgba(58, 51, 88, 0.06);
+    --ink: #3A3358;
+    --muted: #756C93;
+    --faint: #A79FC0;
+    --border: #ECE1CE;
+
+    --accent-dark: #5B4B9A;
+    --accent-dark-hover: #48397D;
+    --accent-pink: #FF6FA5;
+    --accent-yellow: #FFC93C;
+
+    --success-bg: #E4FBE9;
+    --success-border: #9FE8B5;
+    --success-text: #1E9E52;
+    --danger-bg: #FFE8EE;
+    --danger-border: #FFB6C9;
+    --danger-text: #E4467B;
+
+    --radius-lg: 30px;
+    --radius-md: 18px;
+    --radius-sm: 12px;
+
+    --font-display: "Baloo 2", "Nunito", sans-serif;
+    --font-body: "Nunito", -apple-system, BlinkMacSystemFont, sans-serif;
+
+    --shadow-card: 6px 8px 0 rgba(58, 51, 88, 0.08), 0 18px 30px rgba(58, 51, 88, 0.08);
+    --shadow-pop: 3px 4px 0 rgba(58, 51, 88, 0.16);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { overflow-x: hidden; }
+
+  body {
+    margin: 0;
+    font-family: var(--font-body);
+    color: var(--ink);
+    min-height: 100vh;
+    position: relative;
+    background: linear-gradient(to bottom, var(--sky-top) 0%, var(--sky-mid) 38%, var(--sky-low) 78%, var(--sky-low) 100%);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; }
+  }
+
+  /* ---------- Background decoration (sky / sun / clouds / grass) ---------- */
+  .bg-decor {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .sun {
+    position: absolute;
+    top: 6%;
+    right: 8%;
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 32%, #FFF1B8, var(--sun) 60%, #FFB236 100%);
+    box-shadow: 0 0 0 14px var(--sun-glow), 0 0 60px 20px var(--sun-glow);
+    animation: sun-breathe 6s ease-in-out infinite;
+  }
+  .sun::before, .sun::after {
+    content: "";
+    position: absolute;
+    top: 34%;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #A9601C;
+  }
+  .sun::before { left: 30%; }
+  .sun::after { left: 58%; }
+  .sun-smile {
+    position: absolute;
+    left: 32%;
+    top: 54%;
+    width: 34%;
+    height: 16%;
+    border-bottom: 5px solid #A9601C;
+    border-radius: 0 0 50% 50%;
+  }
+  @keyframes sun-breathe {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.06); }
+  }
+
+  .cloud {
+    position: absolute;
+    background: var(--cloud);
+    border-radius: 100px;
+    opacity: 0.92;
+    filter: drop-shadow(0 6px 0 rgba(255,255,255,0.4));
+  }
+  .cloud::before, .cloud::after {
+    content: "";
+    position: absolute;
+    background: var(--cloud);
+    border-radius: 50%;
+  }
+  .cloud-1 { top: 10%; left: -10%; width: 140px; height: 46px; animation: drift 46s linear infinite; }
+  .cloud-1::before { width: 60px; height: 60px; top: -30px; left: 18px; }
+  .cloud-1::after  { width: 46px; height: 46px; top: -22px; left: 74px; }
+
+  .cloud-2 { top: 22%; left: 30%; width: 100px; height: 36px; opacity: 0.8; animation: drift 60s linear infinite; animation-delay: -20s; }
+  .cloud-2::before { width: 46px; height: 46px; top: -22px; left: 12px; }
+  .cloud-2::after  { width: 34px; height: 34px; top: -16px; left: 52px; }
+
+  .cloud-3 { top: 6%; left: 55%; width: 120px; height: 40px; opacity: 0.85; animation: drift 52s linear infinite; animation-delay: -8s; }
+  .cloud-3::before { width: 52px; height: 52px; top: -26px; left: 14px; }
+  .cloud-3::after  { width: 38px; height: 38px; top: -18px; left: 64px; }
+
+  .cloud-4 { top: 34%; left: 78%; width: 90px; height: 32px; opacity: 0.75; animation: drift 40s linear infinite; animation-delay: -30s; }
+  .cloud-4::before { width: 40px; height: 40px; top: -20px; left: 10px; }
+  .cloud-4::after  { width: 30px; height: 30px; top: -14px; left: 46px; }
+
+  @keyframes drift {
+    from { transform: translateX(-10vw); }
+    to   { transform: translateX(110vw); }
+  }
+
+  .kite {
+    position: absolute;
+    top: 16%;
+    left: 14%;
+    font-size: 34px;
+    animation: bob 5s ease-in-out infinite;
+  }
+  .balloon {
+    position: absolute;
+    top: 44%;
+    right: 6%;
+    font-size: 30px;
+    animation: bob 6.5s ease-in-out infinite;
+    animation-delay: -2s;
+  }
+  @keyframes bob {
+    0%, 100% { transform: translateY(0) rotate(-3deg); }
+    50% { transform: translateY(-14px) rotate(3deg); }
+  }
+
+  .grass-hill {
+    position: absolute;
+    left: -5%;
+    right: -5%;
+    bottom: -6%;
+    height: 18%;
+    min-height: 130px;
+    background: var(--grass-2);
+    border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  }
+  .grass-hill::before {
+    content: "";
+    position: absolute;
+    left: -8%;
+    right: 40%;
+    bottom: -4%;
+    height: 80%;
+    background: var(--grass-1);
+    border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  }
+  .grass-hill::after {
+    content: "";
+    position: absolute;
+    left: 35%;
+    right: -8%;
+    bottom: -8%;
+    height: 70%;
+    background: var(--grass-3);
+    border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  }
+  .flower {
+    position: absolute;
+    bottom: 4%;
+    font-size: 20px;
+    z-index: 1;
+  }
+
+  /* ---------- Layout ---------- */
+  .wrap {
+    position: relative;
+    z-index: 1;
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 32px 20px 60px;
+  }
+
+  /* ---------- Header ---------- */
+  header {
+    text-align: center;
+    margin-bottom: 30px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  header h1 {
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--ink);
+    text-shadow: 3px 3px 0 rgba(255,255,255,0.6);
+  }
+
+  header p.subtitle {
+    color: var(--muted);
+    margin: 0;
+    font-size: 0.98rem;
+    font-weight: 600;
+  }
+
+  .parent-btn {
+    position: absolute;
+    right: 0;
+    top: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #FFFDF7;
+    border: 2px solid var(--border);
+    border-radius: 999px;
+    padding: 8px 16px;
+    font-family: var(--font-display);
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    box-shadow: var(--shadow-pop);
+    transition: transform 0.15s ease;
+  }
+  .parent-btn:hover { color: var(--ink); transform: translateY(-2px); }
+  .parent-btn:active { transform: translateY(0); box-shadow: 1px 2px 0 rgba(58,51,88,0.16); }
+
+  .clock-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.85);
+    border: 2px solid var(--border);
+    border-radius: 999px;
+    padding: 7px 18px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--muted);
+  }
+  .clock-badge .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--faint); }
+  .clock-badge .date-part { text-transform: capitalize; }
+  .clock-badge .time-part { font-variant-numeric: tabular-nums; }
+
+  /* ---------- Add child form ---------- */
+  .add-form {
+    display: flex;
+    gap: 10px;
+    max-width: 440px;
+    margin: 0 auto 36px;
+  }
+  .add-form input {
+    flex: 1;
+    border-radius: 999px;
+    padding: 13px 22px;
+    border: 2px solid var(--border);
+    background: var(--card-bg);
+    box-shadow: var(--shadow-pop);
+    outline: none;
+    font-size: 0.95rem;
+    font-family: var(--font-body);
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .add-form input::placeholder { color: var(--faint); font-weight: 600; }
+  .add-form input:focus { box-shadow: 0 0 0 4px rgba(91,75,154,0.18); }
+  .add-form button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: 999px;
+    background: var(--accent-dark);
+    color: #fff;
+    border: none;
+    padding: 13px 24px;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.92rem;
+    cursor: pointer;
+    box-shadow: var(--shadow-pop);
+    transition: transform 0.15s ease;
+  }
+  .add-form button:hover { background: var(--accent-dark-hover); transform: translateY(-2px); }
+  .add-form button:active { transform: translateY(0); box-shadow: 1px 2px 0 rgba(58,51,88,0.16); }
+
+  .empty-state {
+    text-align: center;
+    color: var(--muted);
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-top: 50px;
+    background: rgba(255,255,255,0.7);
+    border: 2px dashed var(--border);
+    border-radius: var(--radius-lg);
+    padding: 30px;
+    max-width: 420px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* ---------- Children grid ---------- */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    gap: 24px;
+  }
+
+  .card {
+    --card-accent: #9B7EDE;
+    background: var(--card-bg);
+    background-image: radial-gradient(var(--paper-line) 1px, transparent 1px);
+    background-size: 14px 14px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    border: 3px solid var(--card-accent);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .card:nth-child(odd) { transform: rotate(-0.6deg); }
+  .card:nth-child(even) { transform: rotate(0.6deg); }
+  .card:hover {
+    transform: translateY(-4px) rotate(0deg);
+    box-shadow: 8px 10px 0 rgba(58,51,88,0.10), 0 22px 34px rgba(58,51,88,0.10);
+  }
+
+  .card-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 18px 0;
+  }
+  .avatar-bubble {
+    flex-shrink: 0;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    border: 3px solid #fff;
+    box-shadow: 0 0 0 2px var(--card-accent, var(--border));
+  }
+  .card-head-text { flex: 1; min-width: 0; }
+  .card-head h3 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .card-head select {
+    margin-top: 4px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--muted);
+    background: #F7F2E7;
+    border-radius: 999px;
+    padding: 4px 10px;
+    border: 1px solid var(--border);
+    font-family: var(--font-body);
+  }
+  .remove-btn {
+    flex-shrink: 0;
+    background: #FFF0F3;
+    border: 1px solid var(--danger-border);
+    color: var(--danger-text);
+    border-radius: 50%;
+    width: 26px; height: 26px;
+    cursor: pointer;
+    font-size: 0.7rem;
+    line-height: 1;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .remove-btn:hover { background: var(--danger-text); color: #fff; }
+
+  .card-body {
+    display: flex;
+    gap: 16px;
+    padding: 14px 18px 0;
+  }
+
+  /* ---------- Thermometer ---------- */
+  .thermo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .thermo-tube-wrap {
+    position: relative;
+    width: 60px;
+    height: 220px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .thermo-tube {
+    position: relative;
+    width: 26px;
+    height: 186px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.85);
+    border: 3px solid #fff;
+    box-shadow: 0 0 0 2px var(--border), inset 3px 0 4px rgba(255,255,255,0.9);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column-reverse;
+  }
+  .thermo-fill {
+    width: 100%;
+    transition: height 0.5s ease-out, background-color 0.5s ease-out;
+    background-image: linear-gradient(to right, rgba(255,255,255,0.35), transparent 40%);
+  }
+  .thermo-bulb {
+    position: relative;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    box-shadow: 0 0 0 2px var(--border);
+    margin-top: -10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    transition: background-color 0.5s ease-out;
+  }
+  .thermo-bulb::before, .thermo-bulb::after {
+    content: "";
+    position: absolute;
+    top: 38%;
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.35);
+  }
+  .thermo-bulb::before { left: 30%; }
+  .thermo-bulb::after { right: 30%; }
+  .thermo-label {
+    font-family: var(--font-display);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  .score-block { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+  .score-num-row { display: flex; align-items: baseline; gap: 6px; }
+  .score-num { font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; color: var(--ink); }
+  .score-label { font-size: 0.72rem; color: var(--faint); font-weight: 700; }
+  .group-pill {
+    border-radius: var(--radius-md);
+    padding: 9px 12px;
+    font-family: var(--font-display);
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #fff;
+    box-shadow: var(--shadow-pop);
+  }
+
+  .task-list {
+    padding: 14px 18px 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .misdeed-list {
+    margin: 10px 18px 18px;
+    padding: 0;
+    border-top: 2px dashed var(--border);
+  }
+  .misdeed-list summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 12px 2px 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .misdeed-list summary::-webkit-details-marker { display: none; }
+  .misdeed-list summary::after {
+    content: "▾";
+    margin-left: auto;
+    color: var(--faint);
+    transition: transform 0.15s ease;
+  }
+  .misdeed-list[open] summary::after { transform: rotate(180deg); }
+  .misdeed-rows { display: flex; flex-direction: column; gap: 8px; padding-bottom: 6px; }
+
+  .misdeed-heading {
+    font-family: var(--font-display);
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: var(--danger-text);
+  }
+
+  .task-item, .misdeed-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 0.86rem;
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    padding: 10px 10px 10px 13px;
+    border: 2px solid var(--border);
+    background: #FBF7EE;
+    color: var(--muted);
+    font-family: var(--font-body);
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+  .task-item .txt, .misdeed-item .txt { flex: 1; min-width: 0; }
+  .task-item.done {
+    background: var(--success-bg); border-color: var(--success-border); color: var(--success-text);
+  }
+  .misdeed-item.active {
+    background: var(--danger-bg); border-color: var(--danger-border); color: var(--danger-text);
+  }
+
+  .stepper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .stepper-btn {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    border: none;
+    background: #E7E0F2;
+    color: var(--accent-dark);
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.12s ease, opacity 0.12s ease;
+  }
+  .stepper-btn:active { transform: scale(0.9); }
+  .stepper-btn:disabled { opacity: 0.35; cursor: default; }
+  .stepper-btn.plus { background: var(--success-text); color: #fff; }
+  .stepper-btn.plus.danger { background: var(--danger-text); }
+  .stepper-count {
+    min-width: 18px;
+    text-align: center;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--ink);
+  }
+
+  /* ---------- Modal (parent panel) ---------- */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(46, 38, 74, 0.45);
+    backdrop-filter: blur(3px);
+    display: none;
+    align-items: center; justify-content: center;
+    padding: 16px;
+    z-index: 50;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--card-bg);
+    background-image: radial-gradient(var(--paper-line) 1px, transparent 1px);
+    background-size: 14px 14px;
+    border-radius: var(--radius-lg);
+    border: 3px solid var(--accent-dark);
+    width: 100%; max-width: 640px;
+    max-height: 85vh;
+    overflow: hidden;
+    box-shadow: 8px 10px 0 rgba(58,51,88,0.18), 0 30px 60px rgba(0,0,0,0.25);
+    display: flex; flex-direction: column;
+  }
+  .modal-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 24px; border-bottom: 2px dashed var(--border);
+    font-family: var(--font-display);
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .modal-head .title { display: flex; align-items: center; gap: 8px; }
+  .modal-close {
+    background: #FFF0F3; border: 1px solid var(--danger-border); cursor: pointer;
+    color: var(--danger-text); font-size: 0.9rem; width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .modal-close:hover { background: var(--danger-text); color: #fff; }
+
+  .pin-stage { padding: 36px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .pin-stage p { font-size: 0.88rem; color: var(--muted); text-align: center; margin: 0; font-weight: 600; }
+  .pin-input {
+    width: 220px; text-align: center; letter-spacing: 0.3em;
+    border-radius: var(--radius-sm); border: 2px solid var(--border);
+    padding: 11px 14px; font-size: 1.05rem; outline: none;
+    font-family: var(--font-display); color: var(--ink);
+  }
+  .pin-input:focus { box-shadow: 0 0 0 4px rgba(91,75,154,0.18); }
+  .pin-error { color: var(--danger-text); font-size: 0.78rem; margin: 0; font-weight: 700; }
+  .primary-btn {
+    border-radius: 999px; background: var(--accent-dark); color: #fff;
+    border: none; padding: 10px 24px; font-family: var(--font-display); font-weight: 600; font-size: 0.88rem;
+    cursor: pointer; box-shadow: var(--shadow-pop); transition: transform 0.15s ease;
+  }
+  .primary-btn:hover { background: var(--accent-dark-hover); transform: translateY(-2px); }
+  .primary-btn:active { transform: translateY(0); box-shadow: 1px 2px 0 rgba(58,51,88,0.16); }
+
+  .tabs { display: flex; gap: 4px; padding: 12px 24px 0; border-bottom: 2px dashed var(--border); }
+  .tab-btn {
+    background: none; border: none; padding: 8px 14px; font-family: var(--font-display); font-weight: 600; font-size: 0.86rem;
+    color: var(--faint); cursor: pointer; border-bottom: 3px solid transparent;
+  }
+  .tab-btn.active { color: var(--accent-dark); border-color: var(--accent-dark); }
+
+  .tab-content { padding: 20px 24px; overflow-y: auto; flex: 1; }
+
+  .group-chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+  .group-chip {
+    padding: 7px 13px; border-radius: 999px; font-family: var(--font-display); font-size: 0.72rem; font-weight: 600;
+    border: 2px solid var(--border); background: #FBF7EE; color: var(--muted); cursor: pointer;
+  }
+  .group-chip.active { color: #fff; border-color: transparent; }
+
+  .inline-add { display: flex; gap: 8px; margin-bottom: 14px; }
+  .inline-add input, .inline-add select {
+    flex: 1; border-radius: var(--radius-sm); border: 2px solid var(--border);
+    padding: 10px 13px; font-size: 0.85rem; outline: none; font-family: var(--font-body); font-weight: 600; color: var(--ink);
+    background: #fff;
+  }
+  .inline-add input:focus, .inline-add select:focus { box-shadow: 0 0 0 4px rgba(91,75,154,0.18); }
+  .inline-add button {
+    border-radius: var(--radius-sm); background: var(--accent-dark); color: #fff; border: none;
+    padding: 10px 14px; cursor: pointer; font-size: 1.1rem; line-height: 1; box-shadow: var(--shadow-pop);
+  }
+
+  .manage-row {
+    display: flex; align-items: center; gap: 8px;
+    background: #FBF7EE; border: 2px solid var(--border); border-radius: var(--radius-sm);
+    padding: 9px 11px; margin-bottom: 7px;
+  }
+  .manage-row span.txt { flex: 1; font-size: 0.85rem; font-weight: 600; color: var(--muted); }
+  .manage-row select.child-age-select {
+    font-size: 0.72rem; font-weight: 700; color: var(--muted); background: #fff;
+    border-radius: 999px; padding: 4px 10px; border: 1px solid var(--border); font-family: var(--font-body);
+  }
+  .manage-row input {
+    flex: 1; border-radius: 8px; border: 1px solid var(--border);
+    padding: 5px 8px; font-size: 0.85rem; outline: none; font-family: var(--font-body);
+  }
+  .icon-btn { background: none; border: none; cursor: pointer; color: var(--faint); padding: 4px; font-size: 0.9rem; }
+  .icon-btn:hover { color: var(--ink); }
+  .icon-btn.danger:hover { color: var(--danger-text); }
+  .icon-btn.success { color: var(--success-text); }
+
+  .empty-note { font-size: 0.8rem; color: var(--faint); text-align: center; padding: 18px 0; font-weight: 600; }
+
+  .history-day { border-radius: var(--radius-md); border: 2px solid var(--border); background: #FBF7EE; padding: 15px 17px; margin-bottom: 10px; }
+  .history-day .h-date { display: flex; align-items: center; gap: 6px; font-family: var(--font-display); font-weight: 600; font-size: 0.86rem; margin-bottom: 6px; color: var(--ink); }
+  .history-day .h-entry { font-size: 0.79rem; color: var(--muted); margin-bottom: 2px; font-weight: 600; }
+
+  .pin-form { display: flex; flex-direction: column; gap: 8px; max-width: 260px; }
+  .pin-form label { font-size: 0.72rem; font-weight: 700; color: var(--muted); margin-top: 6px; }
+  .pin-form input {
+    border-radius: var(--radius-sm); border: 2px solid var(--border); padding: 10px 13px;
+    font-size: 0.85rem; outline: none; font-family: var(--font-body); color: var(--ink);
+  }
+  .pin-msg { font-size: 0.78rem; font-weight: 700; }
+  .pin-msg.ok { color: var(--success-text); }
+  .pin-msg.err { color: var(--danger-text); }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="bg-decor" aria-hidden="true">
+  <div class="sun"><div class="sun-smile"></div></div>
+  <div class="cloud cloud-1"></div>
+  <div class="cloud cloud-2"></div>
+  <div class="cloud cloud-3"></div>
+  <div class="cloud cloud-4"></div>
+  <div class="kite">🪁</div>
+  <div class="balloon">🎈</div>
+  <div class="grass-hill"></div>
+  <div class="flower" style="left:8%;">🌼</div>
+  <div class="flower" style="left:20%; bottom:2%;">🌸</div>
+  <div class="flower" style="left:38%;">🌷</div>
+  <div class="flower" style="left:58%; bottom:3%;">🌼</div>
+  <div class="flower" style="left:74%;">🌸</div>
+  <div class="flower" style="left:88%; bottom:2%;">🌷</div>
+</div>
+
+<div class="wrap">
+  <header>
+    <button class="parent-btn" id="openParentBtn">⚙ Parent</button>
+    <h1>Le thermomètre du comportement</h1>
+    <p class="subtitle">Chaque bonne action réchauffe le thermomètre, chaque bêtise le refroidit.</p>
+    <div class="clock-badge">
+      <span class="date-part" id="clockDate"></span>
+      <span class="dot"></span>
+      <span class="time-part" id="clockTime"></span>
+    </div>
+  </header>
+
+  <div id="emptyState" class="empty-state" style="display:none;">Aucun enfant pour l'instant. Ouvre le panneau <strong>Parent</strong> pour en ajouter un.</div>
+  <div class="grid" id="childrenGrid"></div>
+</div>
+
+<!-- Parent modal -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="title" id="modalTitleIcon">🔒 Panneau parent</span>
+      <button class="modal-close" id="closeParentBtn">✕</button>
+    </div>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   DONNÉES PAR DÉFAUT (issues du document "Tâches ménagères par âges")
+   ========================================================= */
+const DEFAULT_CATALOG = [
+  { id: "2-3", label: "2 à 3 ans", color: "#7DD3E8", tasks: [
+    "Ranger les jouets dans les bacs","Jeter les déchets à la poubelle","Jeter sa couche à la poubelle",
+    "Ranger les livres dans étagères basses","Se brosser les dents avec aide","Ramasser un verre d'eau renversé",
+    "Apporter des plats non chauds à table","Préparation repas : verser ingrédients dans un bol",
+    "Trouver les paires de chaussettes qui vont ensemble","Ranger chaussures dans l'entrée ou meuble dédié",
+    "Accrocher manteau au porte-manteau (si bas)","Se laver les mains tout seul avec un marchepied"
+  ]},
+  { id: "4-5", label: "4 à 5 ans", color: "#6FE3C0", tasks: [
+    "Ranger ses jouets","Aider à mettre la table","Se servir de l'eau seul","Arroser plantes avec aide d'un adulte",
+    "Nettoyer un petit dégât","Mettre linge sale dans le panier","Plier des serviettes propres","S'habiller seul",
+    "Nourrir les animaux avec l'aide d'un adulte","Ranger les courses avec l'aide d'un adulte","Se laver seul",
+    "Autonome aux toilettes pour s'essuyer","Ranger des vêtements déjà pliés dans un placard bas ou tiroirs",
+    "Mettre ses couverts sales dans le lave-vaisselle","Nettoyer petites surfaces avec un chiffon","Jeter ses déchets dans la poubelle"
+  ]},
+  { id: "6-7", label: "6 à 7 ans", color: "#9AE66E", tasks: [
+    "Vider le lave-vaisselle avec l'aide d'un adulte","Retirer mauvaises herbes du jardin ou ramasser les feuilles",
+    "Mettre un sac poubelle propre","Vider sa boîte à goûter","Remplacer les rouleaux de papier toilette",
+    "Plier le petit linge, caleçons, culottes et chaussettes","Aide à la préparation d'un repas","Choisir ses vêtements seul",
+    "Faire son lit","Trier le linge sale, couleur et blanc","Commander du pain à la boulangerie","Préparer son goûter",
+    "Mettre de côté des affaires pour partir un week-end","Essuyer la table après un repas","Passer le balai",
+    "Ranger son bureau","Faire son cartable pour le lendemain"
+  ]},
+  { id: "8-9", label: "8 à 9 ans", color: "#F4D35E", tasks: [
+    "Remplir le lave-vaisselle","Cuisiner une recette simple","Participer à faire sa valise","Préparer son petit déjeuner",
+    "Passer le balai","Ranger les courses","Plier et ranger ses vêtements propres","Vider le lave-vaisselle",
+    "Régler un réveil pour se lever et se réveiller seul","Nettoyer son vélo","Nettoyer sa chambre",
+    "Retirer ses draps sales et les mettre dans le lave-linge","Jeter la poubelle","Aller chercher le courrier"
+  ]},
+  { id: "10-11", label: "10 à 11 ans", color: "#F2A65A", tasks: [
+    "Nettoyer la salle de bain","Passer l'aspirateur","Aider un adulte pour le bricolage","Coudre",
+    "Aider à nettoyer la cuisine","Étendre le linge","Promener le chien","Savoir lancer lave-vaisselle et lave-linge"
+  ]},
+  { id: "12+", label: "12 ans et +", color: "#EF6F6C", tasks: [
+    "Tondre la pelouse","Laver la voiture","Faire les courses avec une liste","Repasser","Préparer un repas simple",
+    "Nettoyer les fenêtres","Superviser un enfant plus petit de la famille","Changer ses draps","Faire une lessive de linge",
+    "Faire seul un trajet quotidien"
+  ]}
+].map(g => ({ ...g, tasks: g.tasks.map((text, i) => ({ id: `${g.id}-t${i}`, text })) }));
+
+const DEFAULT_MISDEEDS = [
+  "A désobéi","A été impoli","A tapé / bousculé","A menti","N'a pas rangé après une remarque","A crié / fait une crise"
+].map((text, i) => ({ id: `m${i}`, text }));
+
+const MIN_SCORE = -10, MAX_SCORE = 10;
+const LS = {
+  children: "tmc_children", catalog: "tmc_catalog", misdeeds: "tmc_misdeeds",
+  pinHash: "tmc_pin_hash", lastReset: "tmc_last_reset", history: "tmc_history"
+};
+
+/* ---------- Storage helpers (real localStorage — this is a standalone web app) ---------- */
+function lsGet(key, fallback) {
+  try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+  catch { return fallback; }
+}
+function lsSet(key, value) {
+  try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
+}
+
+function todayStr(d) {
+  const y = d.getFullYear(), m = String(d.getMonth()+1).padStart(2,"0"), day = String(d.getDate()).padStart(2,"0");
+  return `${y}-${m}-${day}`;
+}
+async function sha256Hex(text) {
+  const enc = new TextEncoder().encode(text);
+  const buf = await crypto.subtle.digest("SHA-256", enc);
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,"0")).join("");
+}
+function uid() { return crypto.randomUUID ? crypto.randomUUID() : "id-" + Math.random().toString(36).slice(2); }
+
+/* ---------- State ---------- */
+let state = {
+  children: lsGet(LS.children, []),
+  catalog: lsGet(LS.catalog, DEFAULT_CATALOG),
+  misdeeds: lsGet(LS.misdeeds, DEFAULT_MISDEEDS),
+  pinHash: lsGet(LS.pinHash, null),
+  lastReset: lsGet(LS.lastReset, todayStr(new Date())),
+  history: lsGet(LS.history, []) // [{date, entries:[{childId,name,score,actions,misdeeds}]}]
+};
+if (!localStorage.getItem(LS.lastReset)) lsSet(LS.lastReset, state.lastReset);
+
+function persist() {
+  lsSet(LS.children, state.children);
+  lsSet(LS.catalog, state.catalog);
+  lsSet(LS.misdeeds, state.misdeeds);
+}
+
+/* ---------- Thermometer color logic ---------- */
+function tempFromScore(score) { return (score - MIN_SCORE) / (MAX_SCORE - MIN_SCORE); }
+function colorForTemp(t) {
+  const stops = [
+    { p:0, c:[61,111,219] }, { p:0.35, c:[95,189,214] }, { p:0.5, c:[230,214,120] },
+    { p:0.7, c:[240,150,80] }, { p:1, c:[224,70,70] }
+  ];
+  let a=stops[0], b=stops[stops.length-1];
+  for (let i=0;i<stops.length-1;i++){ if (t>=stops[i].p && t<=stops[i+1].p){ a=stops[i]; b=stops[i+1]; break; } }
+  const span = (b.p-a.p)||1, local=(t-a.p)/span;
+  const c = a.c.map((v,i)=>Math.round(v+(b.c[i]-v)*local));
+  return `rgb(${c[0]},${c[1]},${c[2]})`;
+}
+function labelForTemp(t) {
+  if (t<0.15) return "Glacial";
+  if (t<0.35) return "Frisquet";
+  if (t<0.5) return "Tiède";
+  if (t<0.65) return "Doux";
+  if (t<0.85) return "Chaud";
+  return "Brûlant !";
+}
+
+/* ---------- Clock + daily reset ---------- */
+function tickClock() {
+  const now = new Date();
+  document.getElementById("clockDate").textContent =
+    new Intl.DateTimeFormat("fr-FR", { weekday:"long", day:"numeric", month:"long" }).format(now);
+  document.getElementById("clockTime").textContent =
+    new Intl.DateTimeFormat("fr-FR", { hour:"2-digit", minute:"2-digit", second:"2-digit" }).format(now);
+
+  const current = todayStr(now);
+  if (current !== state.lastReset) doDailyReset(current);
+}
+
+function doDailyReset(current) {
+  const entries = state.children.map(c => ({
+    childId: c.id, name: c.name,
+    score: c.doneToday.length - c.misdeedsToday.length,
+    actions: c.doneToday, misdeeds: c.misdeedsToday
+  }));
+  state.history = [{ date: state.lastReset, entries }, ...state.history].slice(0, 30);
+  lsSet(LS.history, state.history);
+
+  state.children = state.children.map(c => ({ ...c, doneToday: [], misdeedsToday: [] }));
+  state.lastReset = current;
+  lsSet(LS.lastReset, current);
+  persist();
+  renderChildren();
+  if (parentPanelState.view === "history") renderModalBody();
+}
+
+/* ---------- Rendering: children grid ---------- */
+function renderChildren() {
+  const grid = document.getElementById("childrenGrid");
+  const empty = document.getElementById("emptyState");
+  grid.innerHTML = "";
+  empty.style.display = state.children.length === 0 ? "block" : "none";
+
+  state.children.forEach(child => {
+    const group = state.catalog.find(g => g.id === child.ageGroup) || state.catalog[0];
+    const score = child.doneToday.length - child.misdeedsToday.length;
+    const t = Math.max(0, Math.min(1, tempFromScore(score)));
+    const color = colorForTemp(t);
+
+    const AVATAR_BY_GROUP = { "2-3": "🐣", "4-5": "🐥", "6-7": "🦊", "8-9": "🐼", "10-11": "🦁", "12+": "🐯" };
+    const avatar = AVATAR_BY_GROUP[group.id] || "⭐";
+
+    const card = document.createElement("div");
+    card.className = "card";
+    card.style.setProperty("--card-accent", group.color);
+
+    const groupOptions = state.catalog.map(g =>
+      `<option value="${g.id}" ${g.id === child.ageGroup ? "selected" : ""}>${g.label}</option>`
+    ).join("");
+
+    const taskItems = group.tasks.map(task => {
+      const count = child.doneToday.filter(d => d.id === task.id).length;
+      return `<div class="task-item ${count > 0 ? "done" : ""}">
+        <span class="txt">${escapeHtml(task.text)}</span>
+        <div class="stepper">
+          <button class="stepper-btn" data-action="dec-task" data-child="${child.id}" data-task="${task.id}" aria-label="Retirer une fois" ${count === 0 ? "disabled" : ""}>−</button>
+          <span class="stepper-count">${count}</span>
+          <button class="stepper-btn plus" data-action="inc-task" data-child="${child.id}" data-task="${task.id}" data-group="${group.id}" aria-label="Ajouter une fois">+</button>
+        </div>
+      </div>`;
+    }).join("");
+
+    const misdeedItems = state.misdeeds.map(m => {
+      const count = child.misdeedsToday.filter(d => d.id === m.id).length;
+      return `<div class="misdeed-item ${count > 0 ? "active" : ""}">
+        <span class="txt">${escapeHtml(m.text)}</span>
+        <div class="stepper">
+          <button class="stepper-btn" data-action="dec-misdeed" data-child="${child.id}" data-misdeed="${m.id}" aria-label="Retirer une fois" ${count === 0 ? "disabled" : ""}>−</button>
+          <span class="stepper-count">${count}</span>
+          <button class="stepper-btn plus danger" data-action="inc-misdeed" data-child="${child.id}" data-misdeed="${m.id}" aria-label="Ajouter une fois">+</button>
+        </div>
+      </div>`;
+    }).join("");
+
+    card.innerHTML = `
+      <div class="card-head">
+        <div class="avatar-bubble" style="background:${group.color};">${avatar}</div>
+        <div class="card-head-text">
+          <h3>${escapeHtml(child.name)}</h3>
+          <select data-action="set-age" data-child="${child.id}">${groupOptions}</select>
+        </div>
+        <button class="remove-btn" data-action="remove-child" data-child="${child.id}" aria-label="Retirer">✕</button>
+      </div>
+      <div class="card-body">
+        <div class="thermo">
+          <div class="thermo-tube-wrap">
+            <div class="thermo-tube">
+              <div class="thermo-fill" style="height:${t*100}%; background-color:${color};"></div>
+            </div>
+            <div class="thermo-bulb" style="background-color:${color};">${t>0.65?"🔥":(t<0.35?"❄️":"")}</div>
+          </div>
+          <div class="thermo-label" style="color:${color};">${labelForTemp(t)}</div>
+        </div>
+        <div class="score-block">
+          <div class="score-num-row">
+            <span class="score-num">${score}</span>
+            <span class="score-label">points aujourd'hui</span>
+          </div>
+          <div class="group-pill" style="background-color:${group.color};">Tâches — ${group.label}</div>
+        </div>
+      </div>
+      <div class="task-list">${taskItems}</div>
+      ${state.misdeeds.length ? `
+        <details class="misdeed-list">
+          <summary class="misdeed-heading">⚠ Bêtises</summary>
+          <div class="misdeed-rows">${misdeedItems}</div>
+        </details>` : ""}
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function escapeHtml(str) {
+  return str.replace(/[&<>"']/g, ch => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[ch]));
+}
+
+/* ---------- Grid event delegation ---------- */
+document.getElementById("childrenGrid").addEventListener("click", (e) => {
+  const el = e.target.closest("[data-action]");
+  if (!el) return;
+  const action = el.dataset.action;
+  const childId = el.dataset.child;
+
+  if (action === "remove-child") {
+    state.children = state.children.filter(c => c.id !== childId);
+    persist(); renderChildren();
+  } else if (action === "inc-task") {
+    const taskId = el.dataset.task, groupId = el.dataset.group;
+    state.children = state.children.map(c => {
+      if (c.id !== childId) return c;
+      const group = state.catalog.find(g => g.id === groupId);
+      const task = group.tasks.find(t => t.id === taskId);
+      if (!task) return c;
+      return { ...c, doneToday: [...c.doneToday, { id: taskId, text: task.text, groupId, at: new Date().toISOString() }] };
+    });
+    persist(); renderChildren();
+  } else if (action === "dec-task") {
+    const taskId = el.dataset.task;
+    state.children = state.children.map(c => {
+      if (c.id !== childId) return c;
+      const idx = c.doneToday.map(d => d.id).lastIndexOf(taskId);
+      if (idx === -1) return c;
+      const doneToday = [...c.doneToday];
+      doneToday.splice(idx, 1);
+      return { ...c, doneToday };
+    });
+    persist(); renderChildren();
+  } else if (action === "inc-misdeed") {
+    const misdeedId = el.dataset.misdeed;
+    state.children = state.children.map(c => {
+      if (c.id !== childId) return c;
+      const m = state.misdeeds.find(x => x.id === misdeedId);
+      if (!m) return c;
+      return { ...c, misdeedsToday: [...c.misdeedsToday, { id: misdeedId, text: m.text, at: new Date().toISOString() }] };
+    });
+    persist(); renderChildren();
+  } else if (action === "dec-misdeed") {
+    const misdeedId = el.dataset.misdeed;
+    state.children = state.children.map(c => {
+      if (c.id !== childId) return c;
+      const idx = c.misdeedsToday.map(d => d.id).lastIndexOf(misdeedId);
+      if (idx === -1) return c;
+      const misdeedsToday = [...c.misdeedsToday];
+      misdeedsToday.splice(idx, 1);
+      return { ...c, misdeedsToday };
+    });
+    persist(); renderChildren();
+  }
+});
+document.getElementById("childrenGrid").addEventListener("change", (e) => {
+  const el = e.target.closest("[data-action='set-age']");
+  if (!el) return;
+  const childId = el.dataset.child;
+  state.children = state.children.map(c => c.id === childId ? { ...c, ageGroup: el.value } : c);
+  persist(); renderChildren();
+});
+
+/* ---------- Add child (called from parent panel) ---------- */
+function addChild(name, ageGroup) {
+  state.children.push({ id: uid(), name, ageGroup: ageGroup || state.catalog[0].id, doneToday: [], misdeedsToday: [] });
+  persist(); renderChildren();
+}
+
+/* =========================================================
+   PARENT PANEL
+   ========================================================= */
+let parentPanelState = { stage: state.pinHash ? "locked" : "setup", view: "children", activeGroup: state.catalog[0]?.id, editingId: null };
+
+document.getElementById("openParentBtn").addEventListener("click", () => {
+  parentPanelState.stage = state.pinHash ? "locked" : "setup";
+  document.getElementById("modalOverlay").classList.add("open");
+  renderModalBody();
+});
+document.getElementById("closeParentBtn").addEventListener("click", () => {
+  document.getElementById("modalOverlay").classList.remove("open");
+});
+document.getElementById("modalOverlay").addEventListener("click", (e) => {
+  if (e.target.id === "modalOverlay") document.getElementById("modalOverlay").classList.remove("open");
+});
+
+function renderModalBody() {
+  const body = document.getElementById("modalBody");
+  document.getElementById("modalTitleIcon").textContent = parentPanelState.stage === "unlocked" ? "🔓 Panneau parent" : "🔒 Panneau parent";
+
+  if (parentPanelState.stage === "setup") {
+    body.innerHTML = `
+      <div class="pin-stage">
+        <p>Première utilisation : choisis un code PIN pour protéger le panneau parent.</p>
+        <input type="password" inputmode="numeric" id="setupPin1" class="pin-input" placeholder="Nouveau code (4 chiffres min.)" />
+        <input type="password" inputmode="numeric" id="setupPin2" class="pin-input" placeholder="Confirme le code" />
+        <p class="pin-error" id="setupError"></p>
+        <button class="primary-btn" id="setupSubmit">Créer le code</button>
+      </div>`;
+    ["setupPin1","setupPin2"].forEach(id => {
+      document.getElementById(id).addEventListener("input", e => { e.target.value = e.target.value.replace(/\D/g,""); });
+    });
+    document.getElementById("setupSubmit").addEventListener("click", async () => {
+      const p1 = document.getElementById("setupPin1").value, p2 = document.getElementById("setupPin2").value;
+      const err = document.getElementById("setupError");
+      if (p1.length < 4) { err.textContent = "Le code doit contenir au moins 4 chiffres."; return; }
+      if (p1 !== p2) { err.textContent = "Les deux codes ne correspondent pas."; return; }
+      state.pinHash = await sha256Hex(p1);
+      lsSet(LS.pinHash, state.pinHash);
+      parentPanelState.stage = "unlocked";
+      renderModalBody();
+    });
+  } else if (parentPanelState.stage === "locked") {
+    body.innerHTML = `
+      <div class="pin-stage">
+        <p>Entre le code PIN parent.</p>
+        <input type="password" inputmode="numeric" id="lockPin" class="pin-input" autofocus />
+        <p class="pin-error" id="lockError"></p>
+        <button class="primary-btn" id="lockSubmit">Déverrouiller</button>
+      </div>`;
+    const pinField = document.getElementById("lockPin");
+    pinField.addEventListener("input", e => { e.target.value = e.target.value.replace(/\D/g,""); });
+    pinField.addEventListener("keydown", e => { if (e.key === "Enter") document.getElementById("lockSubmit").click(); });
+    pinField.focus();
+    document.getElementById("lockSubmit").addEventListener("click", async () => {
+      const p = pinField.value;
+      const hash = await sha256Hex(p);
+      if (hash === state.pinHash) { parentPanelState.stage = "unlocked"; renderModalBody(); }
+      else { document.getElementById("lockError").textContent = "Code incorrect."; pinField.value = ""; }
+    });
+  } else {
+    renderUnlockedPanel(body);
+  }
+}
+
+function renderUnlockedPanel(body) {
+  const tabs = [
+    { id: "children", label: "Enfants" },
+    { id: "tasks", label: "Tâches" },
+    { id: "misdeeds", label: "Bêtises" },
+    { id: "history", label: "Historique" },
+    { id: "pin", label: "Code PIN" }
+  ];
+  body.innerHTML = `
+    <div class="tabs">
+      ${tabs.map(t => `<button class="tab-btn ${parentPanelState.view === t.id ? "active" : ""}" data-tab="${t.id}">${t.label}</button>`).join("")}
+    </div>
+    <div class="tab-content" id="tabContent"></div>
+  `;
+  body.querySelectorAll(".tab-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      parentPanelState.view = btn.dataset.tab;
+      parentPanelState.editingId = null;
+      renderModalBody();
+    });
+  });
+  const content = document.getElementById("tabContent");
+  if (parentPanelState.view === "children") renderChildrenTab(content);
+  else if (parentPanelState.view === "tasks") renderTasksTab(content);
+  else if (parentPanelState.view === "misdeeds") renderMisdeedsTab(content);
+  else if (parentPanelState.view === "history") renderHistoryTab(content);
+  else if (parentPanelState.view === "pin") renderPinTab(content);
+}
+
+function renderChildrenTab(content) {
+  const groupOptions = state.catalog.map(g => `<option value="${g.id}">${g.label}</option>`).join("");
+  content.innerHTML = `
+    <div class="inline-add">
+      <input type="text" id="newChildName" placeholder="Prénom de l'enfant" />
+      <select id="newChildAge">${groupOptions}</select>
+      <button id="addChildParentBtn">+</button>
+    </div>
+    <div id="childRows">
+      ${state.children.length === 0 ? `<p class="empty-note">Aucun enfant pour l'instant.</p>` :
+        state.children.map(c => renderChildManageRow(c)).join("")}
+    </div>
+  `;
+  document.getElementById("addChildParentBtn").addEventListener("click", () => {
+    const nameInput = document.getElementById("newChildName");
+    const ageSelect = document.getElementById("newChildAge");
+    const name = nameInput.value.trim();
+    if (!name) return;
+    addChild(name, ageSelect.value);
+    renderModalBody();
+  });
+  document.getElementById("newChildName").addEventListener("keydown", e => { if (e.key === "Enter") document.getElementById("addChildParentBtn").click(); });
+
+  content.querySelectorAll(".manage-row[data-kind='child']").forEach(row => {
+    const id = row.dataset.id;
+    const editBtn = row.querySelector('[data-action="edit"]');
+    const delBtn = row.querySelector('[data-action="delete"]');
+    const saveBtn = row.querySelector('[data-action="save"]');
+    const ageSelect = row.querySelector(".child-age-select");
+    if (editBtn) editBtn.addEventListener("click", () => { parentPanelState.editingId = id; renderModalBody(); });
+    if (delBtn) delBtn.addEventListener("click", () => {
+      state.children = state.children.filter(c => c.id !== id);
+      persist(); renderModalBody(); renderChildren();
+    });
+    if (saveBtn) saveBtn.addEventListener("click", () => {
+      const val = row.querySelector(".edit-input").value.trim();
+      if (!val) return;
+      const c = state.children.find(c => c.id === id);
+      c.name = val;
+      parentPanelState.editingId = null;
+      persist(); renderModalBody(); renderChildren();
+    });
+    if (ageSelect) ageSelect.addEventListener("change", () => {
+      const c = state.children.find(c => c.id === id);
+      c.ageGroup = ageSelect.value;
+      persist(); renderModalBody(); renderChildren();
+    });
+    const editInput = row.querySelector(".edit-input");
+    if (editInput) editInput.addEventListener("keydown", e => { if (e.key === "Enter") saveBtn.click(); });
+  });
+}
+
+function renderChildManageRow(child) {
+  const editing = parentPanelState.editingId === child.id;
+  const groupOptions = state.catalog.map(g => `<option value="${g.id}" ${g.id === child.ageGroup ? "selected" : ""}>${g.label}</option>`).join("");
+  return `
+    <div class="manage-row" data-id="${child.id}" data-kind="child">
+      ${editing
+        ? `<input type="text" class="edit-input" value="${escapeHtml(child.name)}" />
+           <button class="icon-btn success" data-action="save">💾</button>`
+        : `<span class="txt">${escapeHtml(child.name)}</span>
+           <select class="child-age-select">${groupOptions}</select>
+           <button class="icon-btn" data-action="edit">✎</button>
+           <button class="icon-btn danger" data-action="delete">🗑</button>`
+      }
+    </div>`;
+}
+
+function renderTasksTab(content) {
+  if (!state.catalog.find(g => g.id === parentPanelState.activeGroup)) parentPanelState.activeGroup = state.catalog[0]?.id;
+  const group = state.catalog.find(g => g.id === parentPanelState.activeGroup);
+  content.innerHTML = `
+    <div class="group-chip-row">
+      ${state.catalog.map(g => `<button class="group-chip ${g.id === group.id ? "active" : ""}" style="${g.id === group.id ? `background:${g.color};` : ""}" data-group="${g.id}">${g.label}</button>`).join("")}
+    </div>
+    <div class="inline-add">
+      <input type="text" id="newTaskInput" placeholder="Nouvelle tâche pour ${group.label}" />
+      <button id="addTaskBtn">+</button>
+    </div>
+    <div id="taskRows">
+      ${group.tasks.length === 0 ? `<p class="empty-note">Aucune tâche pour ce groupe.</p>` :
+        group.tasks.map(t => renderManageRow(t, "task")).join("")}
+    </div>
+  `;
+  content.querySelectorAll(".group-chip").forEach(chip => {
+    chip.addEventListener("click", () => { parentPanelState.activeGroup = chip.dataset.group; parentPanelState.editingId = null; renderModalBody(); });
+  });
+  document.getElementById("addTaskBtn").addEventListener("click", () => {
+    const input = document.getElementById("newTaskInput");
+    const text = input.value.trim();
+    if (!text) return;
+    group.tasks.push({ id: `${group.id}-${uid()}`, text });
+    persist(); renderModalBody(); renderChildren();
+  });
+  document.getElementById("newTaskInput").addEventListener("keydown", e => { if (e.key === "Enter") document.getElementById("addTaskBtn").click(); });
+
+  bindManageRows(content, "task", group);
+}
+
+function renderMisdeedsTab(content) {
+  content.innerHTML = `
+    <div class="inline-add">
+      <input type="text" id="newMisdeedInput" placeholder="Nouvelle bêtise" />
+      <button id="addMisdeedBtn">+</button>
+    </div>
+    <div id="misdeedRows">
+      ${state.misdeeds.length === 0 ? `<p class="empty-note">Aucune bêtise enregistrée.</p>` :
+        state.misdeeds.map(m => renderManageRow(m, "misdeed")).join("")}
+    </div>
+  `;
+  document.getElementById("addMisdeedBtn").addEventListener("click", () => {
+    const input = document.getElementById("newMisdeedInput");
+    const text = input.value.trim();
+    if (!text) return;
+    state.misdeeds.push({ id: uid(), text });
+    persist(); renderModalBody(); renderChildren();
+  });
+  document.getElementById("newMisdeedInput").addEventListener("keydown", e => { if (e.key === "Enter") document.getElementById("addMisdeedBtn").click(); });
+
+  bindManageRows(content, "misdeed", null);
+}
+
+function renderManageRow(item, kind) {
+  const editing = parentPanelState.editingId === item.id;
+  return `
+    <div class="manage-row" data-id="${item.id}" data-kind="${kind}">
+      ${editing
+        ? `<input type="text" class="edit-input" value="${escapeHtml(item.text)}" />
+           <button class="icon-btn success" data-action="save">💾</button>`
+        : `<span class="txt">${escapeHtml(item.text)}</span>
+           <button class="icon-btn" data-action="edit">✎</button>
+           <button class="icon-btn danger" data-action="delete">🗑</button>`
+      }
+    </div>`;
+}
+
+function bindManageRows(content, kind, group) {
+  content.querySelectorAll(`.manage-row[data-kind="${kind}"]`).forEach(row => {
+    const id = row.dataset.id;
+    const editBtn = row.querySelector('[data-action="edit"]');
+    const delBtn = row.querySelector('[data-action="delete"]');
+    const saveBtn = row.querySelector('[data-action="save"]');
+    if (editBtn) editBtn.addEventListener("click", () => { parentPanelState.editingId = id; renderModalBody(); });
+    if (delBtn) delBtn.addEventListener("click", () => {
+      if (kind === "task") group.tasks = group.tasks.filter(t => t.id !== id);
+      else state.misdeeds = state.misdeeds.filter(m => m.id !== id);
+      persist(); renderModalBody(); renderChildren();
+    });
+    if (saveBtn) saveBtn.addEventListener("click", () => {
+      const val = row.querySelector(".edit-input").value.trim();
+      if (!val) return;
+      if (kind === "task") { const t = group.tasks.find(t => t.id === id); t.text = val; }
+      else { const m = state.misdeeds.find(m => m.id === id); m.text = val; }
+      parentPanelState.editingId = null;
+      persist(); renderModalBody(); renderChildren();
+    });
+    const editInput = row.querySelector(".edit-input");
+    if (editInput) editInput.addEventListener("keydown", e => { if (e.key === "Enter") saveBtn.click(); });
+  });
+}
+
+function renderHistoryTab(content) {
+  if (state.history.length === 0) {
+    content.innerHTML = `<p class="empty-note">Pas encore d'historique archivé (il se construit chaque nouveau jour).</p>`;
+    return;
+  }
+  content.innerHTML = state.history.map(day => `
+    <div class="history-day">
+      <div class="h-date">🕘 ${day.date}</div>
+      ${day.entries.map(e => `
+        <div class="h-entry"><strong>${escapeHtml(e.name)}</strong> — score final : ${e.score}
+        (${e.actions.length} action${e.actions.length !== 1 ? "s" : ""}, ${e.misdeeds.length} bêtise${e.misdeeds.length !== 1 ? "s" : ""})</div>
+      `).join("")}
+    </div>
+  `).join("");
+}
+
+function renderPinTab(content) {
+  content.innerHTML = `
+    <div class="pin-form">
+      <label>Code actuel</label>
+      <input type="password" inputmode="numeric" id="oldPin" />
+      <label>Nouveau code</label>
+      <input type="password" inputmode="numeric" id="newPin1" />
+      <label>Confirme le nouveau code</label>
+      <input type="password" inputmode="numeric" id="newPin2" />
+      <p class="pin-msg" id="pinMsg"></p>
+      <button class="primary-btn" id="changePinBtn" style="align-self:flex-start;">Mettre à jour le code</button>
+    </div>
+  `;
+  ["oldPin","newPin1","newPin2"].forEach(id => {
+    document.getElementById(id).addEventListener("input", e => { e.target.value = e.target.value.replace(/\D/g,""); });
+  });
+  document.getElementById("changePinBtn").addEventListener("click", async () => {
+    const oldPin = document.getElementById("oldPin").value;
+    const newPin1 = document.getElementById("newPin1").value;
+    const newPin2 = document.getElementById("newPin2").value;
+    const msg = document.getElementById("pinMsg");
+    msg.className = "pin-msg";
+    const oldHash = await sha256Hex(oldPin);
+    if (oldHash !== state.pinHash) { msg.textContent = "Code actuel incorrect."; msg.classList.add("err"); return; }
+    if (newPin1.length < 4) { msg.textContent = "Le nouveau code doit contenir au moins 4 chiffres."; msg.classList.add("err"); return; }
+    if (newPin1 !== newPin2) { msg.textContent = "Les deux nouveaux codes ne correspondent pas."; msg.classList.add("err"); return; }
+    state.pinHash = await sha256Hex(newPin1);
+    lsSet(LS.pinHash, state.pinHash);
+    msg.textContent = "Code mis à jour."; msg.classList.add("ok");
+    document.getElementById("oldPin").value = ""; document.getElementById("newPin1").value = ""; document.getElementById("newPin2").value = "";
+  });
+}
+
+/* ---------- Init ---------- */
+renderChildren();
+tickClock();
+setInterval(tickClock, 1000);
+</script>
+</body>
+</html>
