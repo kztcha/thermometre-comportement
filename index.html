@@ -494,72 +494,98 @@
     box-shadow: var(--shadow-pop);
   }
 
-  .task-list, .misdeed-list {
-    padding: 14px 18px 0;
+  .task-list {
+    padding: 14px 18px 4px;
     display: flex;
     flex-direction: column;
-    gap: 7px;
+    gap: 8px;
   }
+
   .misdeed-list {
-    margin-top: 8px;
-    padding-top: 14px;
-    padding-bottom: 20px;
+    margin: 10px 18px 18px;
+    padding: 0;
     border-top: 2px dashed var(--border);
   }
-  .task-list { padding-bottom: 10px; }
+  .misdeed-list summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 12px 2px 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .misdeed-list summary::-webkit-details-marker { display: none; }
+  .misdeed-list summary::after {
+    content: "▾";
+    margin-left: auto;
+    color: var(--faint);
+    transition: transform 0.15s ease;
+  }
+  .misdeed-list[open] summary::after { transform: rotate(180deg); }
+  .misdeed-rows { display: flex; flex-direction: column; gap: 8px; padding-bottom: 6px; }
+
   .misdeed-heading {
     font-family: var(--font-display);
-    font-size: 0.74rem;
+    font-size: 0.76rem;
     font-weight: 600;
     color: var(--danger-text);
-    margin-bottom: 2px;
   }
 
   .task-item, .misdeed-item {
     display: flex;
-    align-items: flex-start;
-    gap: 9px;
-    text-align: left;
-    font-size: 0.85rem;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 0.86rem;
     font-weight: 600;
     border-radius: var(--radius-sm);
-    padding: 9px 11px;
+    padding: 10px 10px 10px 13px;
     border: 2px solid var(--border);
     background: #FBF7EE;
     color: var(--muted);
-    cursor: pointer;
     font-family: var(--font-body);
-    transition: transform 0.12s ease, background 0.15s ease, border-color 0.15s ease;
+    transition: background 0.15s ease, border-color 0.15s ease;
   }
-  .task-item:hover, .misdeed-item:hover { border-color: var(--faint); transform: translateY(-1px); }
+  .task-item .txt, .misdeed-item .txt { flex: 1; min-width: 0; }
   .task-item.done {
     background: var(--success-bg); border-color: var(--success-border); color: var(--success-text);
-    animation: pop 0.25s ease;
   }
-  .task-item.done span.txt { text-decoration: line-through; opacity: 0.75; }
   .misdeed-item.active {
     background: var(--danger-bg); border-color: var(--danger-border); color: var(--danger-text);
-    animation: pop 0.25s ease;
-  }
-  @keyframes pop {
-    0% { transform: scale(0.94); }
-    60% { transform: scale(1.02); }
-    100% { transform: scale(1); }
   }
 
-  .checkbox {
+  .stepper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     flex-shrink: 0;
-    margin-top: 1px;
-    width: 18px; height: 18px;
-    border-radius: 7px;
-    border: 2px solid #D8CDB0;
-    background: #fff;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 11px; color: #fff;
-    font-weight: 700;
   }
-  .task-item.done .checkbox { background: var(--success-text); border-color: var(--success-text); }
-  .misdeed-item.active .checkbox { background: var(--danger-text); border-color: var(--danger-text); }
+  .stepper-btn {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    border: none;
+    background: #E7E0F2;
+    color: var(--accent-dark);
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.12s ease, opacity 0.12s ease;
+  }
+  .stepper-btn:active { transform: scale(0.9); }
+  .stepper-btn:disabled { opacity: 0.35; cursor: default; }
+  .stepper-btn.plus { background: var(--success-text); color: #fff; }
+  .stepper-btn.plus.danger { background: var(--danger-text); }
+  .stepper-count {
+    min-width: 18px;
+    text-align: center;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--ink);
+  }
 
   /* ---------- Modal (parent panel) ---------- */
   .modal-overlay {
@@ -634,11 +660,12 @@
   .group-chip.active { color: #fff; border-color: transparent; }
 
   .inline-add { display: flex; gap: 8px; margin-bottom: 14px; }
-  .inline-add input {
+  .inline-add input, .inline-add select {
     flex: 1; border-radius: var(--radius-sm); border: 2px solid var(--border);
     padding: 10px 13px; font-size: 0.85rem; outline: none; font-family: var(--font-body); font-weight: 600; color: var(--ink);
+    background: #fff;
   }
-  .inline-add input:focus { box-shadow: 0 0 0 4px rgba(91,75,154,0.18); }
+  .inline-add input:focus, .inline-add select:focus { box-shadow: 0 0 0 4px rgba(91,75,154,0.18); }
   .inline-add button {
     border-radius: var(--radius-sm); background: var(--accent-dark); color: #fff; border: none;
     padding: 10px 14px; cursor: pointer; font-size: 1.1rem; line-height: 1; box-shadow: var(--shadow-pop);
@@ -650,6 +677,10 @@
     padding: 9px 11px; margin-bottom: 7px;
   }
   .manage-row span.txt { flex: 1; font-size: 0.85rem; font-weight: 600; color: var(--muted); }
+  .manage-row select.child-age-select {
+    font-size: 0.72rem; font-weight: 700; color: var(--muted); background: #fff;
+    border-radius: 999px; padding: 4px 10px; border: 1px solid var(--border); font-family: var(--font-body);
+  }
   .manage-row input {
     flex: 1; border-radius: 8px; border: 1px solid var(--border);
     padding: 5px 8px; font-size: 0.85rem; outline: none; font-family: var(--font-body);
@@ -678,10 +709,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
-<link rel="manifest" href="manifest.json" />
-<meta name="theme-color" content="#5B4B9A" />
-<link rel="icon" href="icons/icon-192.png" />
-<link rel="apple-touch-icon" href="icons/icon-192.png" />
 </head>
 <body>
 
@@ -714,12 +741,7 @@
     </div>
   </header>
 
-  <div class="add-form">
-    <input type="text" id="nameInput" placeholder="Prénom de l'enfant" />
-    <button id="addChildBtn">+ Ajouter</button>
-  </div>
-
-  <div id="emptyState" class="empty-state" style="display:none;">Ajoute un enfant pour démarrer son thermomètre.</div>
+  <div id="emptyState" class="empty-state" style="display:none;">Aucun enfant pour l'instant. Ouvre le panneau <strong>Parent</strong> pour en ajouter un.</div>
   <div class="grid" id="childrenGrid"></div>
 </div>
 
@@ -888,8 +910,6 @@ function renderChildren() {
     const score = child.doneToday.length - child.misdeedsToday.length;
     const t = Math.max(0, Math.min(1, tempFromScore(score)));
     const color = colorForTemp(t);
-    const doneIds = new Set(child.doneToday.map(d => d.id));
-    const misdeedIds = new Set(child.misdeedsToday.map(d => d.id));
 
     const AVATAR_BY_GROUP = { "2-3": "🐣", "4-5": "🐥", "6-7": "🦊", "8-9": "🐼", "10-11": "🦁", "12+": "🐯" };
     const avatar = AVATAR_BY_GROUP[group.id] || "⭐";
@@ -903,19 +923,27 @@ function renderChildren() {
     ).join("");
 
     const taskItems = group.tasks.map(task => {
-      const done = doneIds.has(task.id);
-      return `<button class="task-item ${done ? "done" : ""}" data-action="toggle-task" data-child="${child.id}" data-task="${task.id}" data-group="${group.id}">
-        <span class="checkbox">${done ? "★" : ""}</span>
+      const count = child.doneToday.filter(d => d.id === task.id).length;
+      return `<div class="task-item ${count > 0 ? "done" : ""}">
         <span class="txt">${escapeHtml(task.text)}</span>
-      </button>`;
+        <div class="stepper">
+          <button class="stepper-btn" data-action="dec-task" data-child="${child.id}" data-task="${task.id}" aria-label="Retirer une fois" ${count === 0 ? "disabled" : ""}>−</button>
+          <span class="stepper-count">${count}</span>
+          <button class="stepper-btn plus" data-action="inc-task" data-child="${child.id}" data-task="${task.id}" data-group="${group.id}" aria-label="Ajouter une fois">+</button>
+        </div>
+      </div>`;
     }).join("");
 
     const misdeedItems = state.misdeeds.map(m => {
-      const active = misdeedIds.has(m.id);
-      return `<button class="misdeed-item ${active ? "active" : ""}" data-action="toggle-misdeed" data-child="${child.id}" data-misdeed="${m.id}">
-        <span class="checkbox">${active ? "!" : ""}</span>
+      const count = child.misdeedsToday.filter(d => d.id === m.id).length;
+      return `<div class="misdeed-item ${count > 0 ? "active" : ""}">
         <span class="txt">${escapeHtml(m.text)}</span>
-      </button>`;
+        <div class="stepper">
+          <button class="stepper-btn" data-action="dec-misdeed" data-child="${child.id}" data-misdeed="${m.id}" aria-label="Retirer une fois" ${count === 0 ? "disabled" : ""}>−</button>
+          <span class="stepper-count">${count}</span>
+          <button class="stepper-btn plus danger" data-action="inc-misdeed" data-child="${child.id}" data-misdeed="${m.id}" aria-label="Ajouter une fois">+</button>
+        </div>
+      </div>`;
     }).join("");
 
     card.innerHTML = `
@@ -946,7 +974,11 @@ function renderChildren() {
         </div>
       </div>
       <div class="task-list">${taskItems}</div>
-      ${state.misdeeds.length ? `<div class="misdeed-list"><div class="misdeed-heading">Bêtises</div>${misdeedItems}</div>` : ""}
+      ${state.misdeeds.length ? `
+        <details class="misdeed-list">
+          <summary class="misdeed-heading">⚠ Bêtises</summary>
+          <div class="misdeed-rows">${misdeedItems}</div>
+        </details>` : ""}
     `;
     grid.appendChild(card);
   });
@@ -966,28 +998,44 @@ document.getElementById("childrenGrid").addEventListener("click", (e) => {
   if (action === "remove-child") {
     state.children = state.children.filter(c => c.id !== childId);
     persist(); renderChildren();
-  } else if (action === "toggle-task") {
+  } else if (action === "inc-task") {
     const taskId = el.dataset.task, groupId = el.dataset.group;
     state.children = state.children.map(c => {
       if (c.id !== childId) return c;
-      const exists = c.doneToday.some(d => d.id === taskId);
       const group = state.catalog.find(g => g.id === groupId);
       const task = group.tasks.find(t => t.id === taskId);
-      const doneToday = exists
-        ? c.doneToday.filter(d => d.id !== taskId)
-        : [...c.doneToday, { id: taskId, text: task.text, groupId, at: new Date().toISOString() }];
+      if (!task) return c;
+      return { ...c, doneToday: [...c.doneToday, { id: taskId, text: task.text, groupId, at: new Date().toISOString() }] };
+    });
+    persist(); renderChildren();
+  } else if (action === "dec-task") {
+    const taskId = el.dataset.task;
+    state.children = state.children.map(c => {
+      if (c.id !== childId) return c;
+      const idx = c.doneToday.map(d => d.id).lastIndexOf(taskId);
+      if (idx === -1) return c;
+      const doneToday = [...c.doneToday];
+      doneToday.splice(idx, 1);
       return { ...c, doneToday };
     });
     persist(); renderChildren();
-  } else if (action === "toggle-misdeed") {
+  } else if (action === "inc-misdeed") {
     const misdeedId = el.dataset.misdeed;
     state.children = state.children.map(c => {
       if (c.id !== childId) return c;
-      const exists = c.misdeedsToday.some(d => d.id === misdeedId);
       const m = state.misdeeds.find(x => x.id === misdeedId);
-      const misdeedsToday = exists
-        ? c.misdeedsToday.filter(d => d.id !== misdeedId)
-        : [...c.misdeedsToday, { id: misdeedId, text: m.text, at: new Date().toISOString() }];
+      if (!m) return c;
+      return { ...c, misdeedsToday: [...c.misdeedsToday, { id: misdeedId, text: m.text, at: new Date().toISOString() }] };
+    });
+    persist(); renderChildren();
+  } else if (action === "dec-misdeed") {
+    const misdeedId = el.dataset.misdeed;
+    state.children = state.children.map(c => {
+      if (c.id !== childId) return c;
+      const idx = c.misdeedsToday.map(d => d.id).lastIndexOf(misdeedId);
+      if (idx === -1) return c;
+      const misdeedsToday = [...c.misdeedsToday];
+      misdeedsToday.splice(idx, 1);
       return { ...c, misdeedsToday };
     });
     persist(); renderChildren();
@@ -1001,22 +1049,16 @@ document.getElementById("childrenGrid").addEventListener("change", (e) => {
   persist(); renderChildren();
 });
 
-/* ---------- Add child ---------- */
-document.getElementById("addChildBtn").addEventListener("click", addChild);
-document.getElementById("nameInput").addEventListener("keydown", e => { if (e.key === "Enter") addChild(); });
-function addChild() {
-  const input = document.getElementById("nameInput");
-  const name = input.value.trim();
-  if (!name) return;
-  state.children.push({ id: uid(), name, ageGroup: state.catalog[0].id, doneToday: [], misdeedsToday: [] });
-  input.value = "";
+/* ---------- Add child (called from parent panel) ---------- */
+function addChild(name, ageGroup) {
+  state.children.push({ id: uid(), name, ageGroup: ageGroup || state.catalog[0].id, doneToday: [], misdeedsToday: [] });
   persist(); renderChildren();
 }
 
 /* =========================================================
    PARENT PANEL
    ========================================================= */
-let parentPanelState = { stage: state.pinHash ? "locked" : "setup", view: "tasks", activeGroup: state.catalog[0]?.id, editingId: null };
+let parentPanelState = { stage: state.pinHash ? "locked" : "setup", view: "children", activeGroup: state.catalog[0]?.id, editingId: null };
 
 document.getElementById("openParentBtn").addEventListener("click", () => {
   parentPanelState.stage = state.pinHash ? "locked" : "setup";
@@ -1081,6 +1123,7 @@ function renderModalBody() {
 
 function renderUnlockedPanel(body) {
   const tabs = [
+    { id: "children", label: "Enfants" },
     { id: "tasks", label: "Tâches" },
     { id: "misdeeds", label: "Bêtises" },
     { id: "history", label: "Historique" },
@@ -1100,10 +1143,79 @@ function renderUnlockedPanel(body) {
     });
   });
   const content = document.getElementById("tabContent");
-  if (parentPanelState.view === "tasks") renderTasksTab(content);
+  if (parentPanelState.view === "children") renderChildrenTab(content);
+  else if (parentPanelState.view === "tasks") renderTasksTab(content);
   else if (parentPanelState.view === "misdeeds") renderMisdeedsTab(content);
   else if (parentPanelState.view === "history") renderHistoryTab(content);
   else if (parentPanelState.view === "pin") renderPinTab(content);
+}
+
+function renderChildrenTab(content) {
+  const groupOptions = state.catalog.map(g => `<option value="${g.id}">${g.label}</option>`).join("");
+  content.innerHTML = `
+    <div class="inline-add">
+      <input type="text" id="newChildName" placeholder="Prénom de l'enfant" />
+      <select id="newChildAge">${groupOptions}</select>
+      <button id="addChildParentBtn">+</button>
+    </div>
+    <div id="childRows">
+      ${state.children.length === 0 ? `<p class="empty-note">Aucun enfant pour l'instant.</p>` :
+        state.children.map(c => renderChildManageRow(c)).join("")}
+    </div>
+  `;
+  document.getElementById("addChildParentBtn").addEventListener("click", () => {
+    const nameInput = document.getElementById("newChildName");
+    const ageSelect = document.getElementById("newChildAge");
+    const name = nameInput.value.trim();
+    if (!name) return;
+    addChild(name, ageSelect.value);
+    renderModalBody();
+  });
+  document.getElementById("newChildName").addEventListener("keydown", e => { if (e.key === "Enter") document.getElementById("addChildParentBtn").click(); });
+
+  content.querySelectorAll(".manage-row[data-kind='child']").forEach(row => {
+    const id = row.dataset.id;
+    const editBtn = row.querySelector('[data-action="edit"]');
+    const delBtn = row.querySelector('[data-action="delete"]');
+    const saveBtn = row.querySelector('[data-action="save"]');
+    const ageSelect = row.querySelector(".child-age-select");
+    if (editBtn) editBtn.addEventListener("click", () => { parentPanelState.editingId = id; renderModalBody(); });
+    if (delBtn) delBtn.addEventListener("click", () => {
+      state.children = state.children.filter(c => c.id !== id);
+      persist(); renderModalBody(); renderChildren();
+    });
+    if (saveBtn) saveBtn.addEventListener("click", () => {
+      const val = row.querySelector(".edit-input").value.trim();
+      if (!val) return;
+      const c = state.children.find(c => c.id === id);
+      c.name = val;
+      parentPanelState.editingId = null;
+      persist(); renderModalBody(); renderChildren();
+    });
+    if (ageSelect) ageSelect.addEventListener("change", () => {
+      const c = state.children.find(c => c.id === id);
+      c.ageGroup = ageSelect.value;
+      persist(); renderModalBody(); renderChildren();
+    });
+    const editInput = row.querySelector(".edit-input");
+    if (editInput) editInput.addEventListener("keydown", e => { if (e.key === "Enter") saveBtn.click(); });
+  });
+}
+
+function renderChildManageRow(child) {
+  const editing = parentPanelState.editingId === child.id;
+  const groupOptions = state.catalog.map(g => `<option value="${g.id}" ${g.id === child.ageGroup ? "selected" : ""}>${g.label}</option>`).join("");
+  return `
+    <div class="manage-row" data-id="${child.id}" data-kind="child">
+      ${editing
+        ? `<input type="text" class="edit-input" value="${escapeHtml(child.name)}" />
+           <button class="icon-btn success" data-action="save">💾</button>`
+        : `<span class="txt">${escapeHtml(child.name)}</span>
+           <select class="child-age-select">${groupOptions}</select>
+           <button class="icon-btn" data-action="edit">✎</button>
+           <button class="icon-btn danger" data-action="delete">🗑</button>`
+      }
+    </div>`;
 }
 
 function renderTasksTab(content) {
@@ -1252,12 +1364,6 @@ function renderPinTab(content) {
 renderChildren();
 tickClock();
 setInterval(tickClock, 1000);
-
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("service-worker.js").catch(() => {});
-  });
-}
 </script>
 </body>
 </html>
